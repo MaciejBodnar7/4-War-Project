@@ -44,11 +44,15 @@ const drawCards = item => {
 }
 
 const render = item => {
+  //render cards from drawCards
   console.log(item)
   const postArr = item
     .map(items => {
       return `
-    <img class="imgs" src="${items.image}" alt="card">
+      <div class="flex flex-col text-center text-2xl ">
+        <img class="imgs" src="${items.image}" alt="card">
+        <p>${items.value}</p>
+      </div>
     `
     })
     .join("")
