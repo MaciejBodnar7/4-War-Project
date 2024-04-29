@@ -3,9 +3,14 @@ console.log("War-Project")
 const drawBtn = document.getElementById("draw-cards-btn")
 drawBtn.disabled
 drawBtn.classList.toggle("disabled")
+
 let deckId
+
 const images = document.getElementById("images")
 let cardsToRender
+
+const me = document.getElementById("cards-value-me")
+const comp = document.getElementById("cards-value-computer")
 
 document.addEventListener("click", function (e) {
   console.log(e.target.id) //Console log
@@ -45,14 +50,13 @@ const drawCards = item => {
 
 const render = item => {
   //render cards from drawCards
-  console.log(item)
   const postArr = item
     .map(items => {
       return `
-      <div class="flex flex-col text-center text-2xl ">
-        <img class="imgs" src="${items.image}" alt="card">
-        <p>${items.value}</p>
-      </div>
+        <div>
+          <img class="imgs" src="${items.image}" alt="card">
+          <p>${items.value}</p>
+        </div>
     `
     })
     .join("")
