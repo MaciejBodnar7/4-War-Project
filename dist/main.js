@@ -1,10 +1,15 @@
 console.log("War-Project")
 
+const remainingCardsP = document.getElementById("remaining-cards")
+
 const drawBtn = document.getElementById("draw-cards-btn")
 drawBtn.disabled
 drawBtn.classList.toggle("disabled")
 
+let meWins = 0
+let compWins = 0
 let deckId
+let remainingCards
 
 const images = document.getElementById("images")
 let cardsToRender
@@ -21,10 +26,18 @@ document.addEventListener("click", function (e) {
       newCardDeck()
     } else {
       newCardDeck()
+      drawBtn.disabled
+      drawBtn.classList.toggle("disabled")
     }
   } else if (e.target.id === "draw-cards-btn") {
-    if (deckId) {
+    if (deckId && remainingCards) {
       drawCards(deckId)
+      remainingCardsP.innerHTML = `<p>Remaining cards: ${remainingCards}</p>`
+
+      if (!remainingCards) {
+        drawBtn.disabled
+        drawBtn.classList.toggle("disabled")
+      }
     }
   }
 })
@@ -34,12 +47,16 @@ const newCardDeck = () => {
     .then(resp => resp.json())
     .then(data => {
       console.log(data)
+      remainingCards = data.remaining
       deckId = data.deck_id
-      console.log(deckId)
+      console.log("Deck id = " + deckId)
+      console.log("Remaining cards = " + remainingCards)
     })
 }
 
 const drawCards = item => {
+  remainingCards -= 2
+  // console.log(remainingCards)
   fetch(`https://apis.scrimba.com/deckofcards/api/deck/${item}/draw/?count=2`)
     .then(resp => resp.json())
     .then(data => {
@@ -56,15 +73,25 @@ const render = item => {
 
   // console.log(item)
   firstDiv.innerHTML = `
-  <p><span class="text-weight">Me: </span>${item[0].value}</p>
+  <p><span class="text-weight">My card: </span>${item[0].value} | Wins: ${meWins}</p>
   <img class="imgs" src="${item[0].image}" alt="">
   `
   secondDiv.innerHTML = `
   <img class="imgs" src="${item[1].image}" alt="">
-  <p><span class="text-weight">Computer: </span>${item[1].value}</p>
+  <p><span class="text-weight">Computer card: </span>${item[1].value} | Wins: ${compWins}</p>
   `
 
   whoWin.innerHTML = `<h2>${winnerOrNot(item)}</h2>`
+
+  if (!remainingCards) {
+    if (meWins > compWins) {
+      whoWin.innerHTML = `<h2>You won!</h2>`
+    } else if (meWins < compWins) {
+      whoWin.innerHTML = `<h2>Computer won! :<</h2>`
+    } else {
+      whoWin.innerHTML = `<h2>Its a tie! Maybe try again!</h2>`
+    }
+  }
 }
 
 const winnerOrNot = item => {
@@ -87,8 +114,10 @@ const winnerOrNot = item => {
   let valueTwo = Number(item[1].value)
 
   if (valueOne > valueTwo) {
+    meWins += 1
     return "You win"
   } else if (valueOne < valueTwo) {
+    compWins += 1
     return "Computer win"
   } else if (valueOne == valueTwo) {
     return "tie"
